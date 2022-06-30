@@ -2,9 +2,11 @@ import Image from 'next/image'
 import { RiSettings3Fill } from 'react-icons/ri'
 import { AiOutlineDown } from 'react-icons/ai'
 import ethLogo from '../assets/eth.png'
-import { useContext } from 'react'
+import React, { useContext } from 'react'
 import Modal from 'react-modal'
 import { useRouter } from 'next/router'
+import { ITransactionContext, TransactionContext } from '../context/TransactionContext'
+import { Context } from 'react'
 
 Modal.setAppElement('#__next')
 
@@ -23,6 +25,17 @@ const style = {
 }
 
 const Main = () => {
+  const context = useContext(TransactionContext)
+  const { formData, handleChange, sendTransaction } = context as ITransactionContext
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault()
+    const { addressTo, amount } = formData
+    if (!addressTo || !amount) return
+
+    await sendTransaction()
+  }
+
   return (
     <div className={style.wrapper}>
       <div className={style.content}>
@@ -39,7 +52,7 @@ const Main = () => {
             className={style.transferPropInput}
             placeholder="0.0"
             pattern="^[0-9]*[.,]?[0-9]*$"
-            // onChange={(e) => handleChange(e, 'amount')}
+            onChange={(e) => handleChange(e, 'amount')}
           />
           <div className={style.currencySelector}>
             <div className={style.currencySelectorContent}>
@@ -57,11 +70,16 @@ const Main = () => {
             type="text"
             className={style.transferPropInput}
             placeholder="0x123..."
-            // onChange={(e) => handleChange(e, 'addressTo')}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e, 'addressTo')}
           />
         </div>
 
-        <div className={style.confirmButton}>Confirm</div>
+        <div
+          className={style.confirmButton}
+          onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => handleSubmit(e)}
+        >
+          Confirm
+        </div>
       </div>
     </div>
   )
